@@ -126,14 +126,35 @@ def to_one_hot(inp,num_classes):
 
 def mixup_process(out, target_reweighted, lam):
     indices = np.random.permutation(out.size(0))
-    out = out*lam + out[indices]*(1-lam)
-    target_shuffled_onehot = target_reweighted[indices]
-    target_reweighted = target_reweighted * lam + target_shuffled_onehot * (1 - lam)
-    
-    #t1 = target.data.cpu().numpy()
-    #t2 = target[indices].data.cpu().numpy()
-    #print (np.sum(t1==t2))
-    return out, target_reweighted
+    group = []
+    for i in range(10):
+      group.append([])
+    m = torch.unique(target_reweighted, dim = 0, return_inverse = True)[1]
+    for i in range(len(m)):
+      group[m[i]].append(i)
+
+    new_batch = []
+    new_batch_labels = []
+    for g in group:
+      for i in range(1, len(g)):
+        cj = out[g[i - 1]]
+        ck = out[g[i]]
+        l = torch.rand(1)[0]
+
+        new_batch.append((cj - ck)*l + cj)
+        new_batch_labels.append(target_reweighted[g[i]])
+
+
+    new_batch = torch.stack(new_batch, dim = 0)
+    new_batch_labels = torch.stack(new_batch_labels, dim = 0)
+
+
+    perm = torch.randperm(190)
+    out = torch.cat((out, new_batch), dim = 0)[perm]
+    target_reweighted = torch.cat((target_reweighted, new_batch_labels), dim = 0)[perm]
+
+    return out[:100], target_reweighted[:100]
+
 
 
 def mixup_data(x, y, alpha):
