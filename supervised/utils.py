@@ -141,7 +141,7 @@ def mixup_process(out, target_reweighted, lam):
         ck = out[g[i]]
         l = torch.rand(1)[0]
 
-        new_batch.append((cj - ck)*l + cj)
+        new_batch.append((cj - ck)*0.5 + cj)
         new_batch_labels.append(target_reweighted[g[i]])
 
 
