@@ -149,11 +149,11 @@ def mixup_process(out, target_reweighted, lam):
     new_batch_labels = torch.stack(new_batch_labels, dim = 0)
 
 
-    perm = torch.randperm(190)
-    out = torch.cat((out, new_batch), dim = 0)[perm]
-    target_reweighted = torch.cat((target_reweighted, new_batch_labels), dim = 0)[perm]
+    # perm = torch.randperm(190)
+    out = torch.cat((out, new_batch), dim = 0)# [perm]
+    target_reweighted = torch.cat((target_reweighted, new_batch_labels), dim = 0)# [perm]
 
-    return out[:100], target_reweighted[:100]
+    return out[40:140], target_reweighted[40:140]
 
 
 
